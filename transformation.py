@@ -84,3 +84,26 @@ df1['TIPO MAGNITUD'] = df1.apply(
 # Drop the old magnitude columns
 df1 = df1.drop(columns=['MAGNITUD Ml', 'MAGNITUD Mw'])
 
+## Changing TIPO MAGNITUD column in df2
+# 1. Change 'ML' to 'Ml' in 'TIPO MAGNITUD'
+df2['TIPO MAGNITUD'] = df2['TIPO MAGNITUD'].str.replace(r'^ML', 'Ml', regex=True)
+
+# 2. Remove any suffixes after 'Mlr' (e.g., 'Mlr_2' -> 'Mlr')
+df2['TIPO MAGNITUD'] = df2['TIPO MAGNITUD'].str.replace(r'^Mlr(_\d+|_PtoGtn.*)$', 'Mlr', regex=True)
+
+# 3. Change 'Mw(mB)' to 'Mw_mb'
+df2['TIPO MAGNITUD'] = df2['TIPO MAGNITUD'].str.replace(r'^Mw\(mB\)$', 'Mw_mb', regex=True)
+
+# 4. Change 'M_MLr' to 'Mlr'
+df2['TIPO MAGNITUD'] = df2['TIPO MAGNITUD'].str.replace('M_MLr', 'Mlr', regex=False)
+
+# 5. Change 'Mw(Mwp)' to 'Mwp'
+df2['TIPO MAGNITUD'] = df2['TIPO MAGNITUD'].str.replace(r'^Mw\(Mwp\)$', 'Mwp', regex=True)
+
+# 6. Change 'M_Pac' to 'M'
+df2['TIPO MAGNITUD'] = df2['TIPO MAGNITUD'].str.replace('M_Pac', 'M', regex=False)
+
+
+
+# Save df2 to a CSV file
+df2.to_csv('df2_modified.csv', index=False)
