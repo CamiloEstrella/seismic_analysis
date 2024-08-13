@@ -185,6 +185,9 @@ df2['MUNICIPIO'] = df2['MUNICIPIO'].str.replace('MANAURE_BALCON_DEL_CESAR', 'MAN
 # 20. Replace 'AREA_EN_LITIGIO_LIMITES_(PURACE' with 'PURACE'
 df2['MUNICIPIO'] = df2['MUNICIPIO'].str.replace(r'AREA_EN_LITIGIO_LIMITES_\((.*?)\)', r'\1', regex=True)
 
+# Replace 'AREA_EN_LITIGIO_LIMITES_(PURACE' or similar with 'PURACE'
+df2['MUNICIPIO'] = df2['MUNICIPIO'].str.replace(r'AREA_EN_LITIGIO_LIMITES_\(([^)]*)', r'\1', regex=True)
+
 # 21. Assign 'MUNICIPIO' and 'DEPARTAMENTO' based on given LATITUDE and LONGITUDE values
 coordinates_mapping = {
     (12.192, -71.93): ('URIBIA', 'LA_GUAJIRA'),
@@ -270,7 +273,16 @@ coordinates_mapping = {
     (9.444, -77.294): ('MAR_CARIBE', 'MAR_CARIBE'),
     (5.321, -77.401): ('BAJO_BAUDO', 'CHOCO'),
     (9.798, -77.967): ('MAR_CARIBE', 'MAR_CARIBE'),
-    (9.357, -77.885): ('MAR_CARIBE', 'MAR_CARIBE')
+    (9.357, -77.885): ('MAR_CARIBE', 'MAR_CARIBE'),
+    (3.793, -76.977): ('BUENAVENTURA', 'VALLE_DEL_CAUCA'),
+    (4.787, -76.192): ('EL_CAIRO', 'VALLE_DEL_CAUCA'),
+    (4.805, -76.187): ('EL_CAIRO', 'VALLE_DEL_CAUCA'),
+    (4.926, -76.03): ('EL_AGUILA', 'VALLE_DEL_CAUCA'),
+    (4.771, -76.189): ('EL_CAIRO', 'VALLE_DEL_CAUCA'),
+    (4.797, -76.174): ('EL_CAIRO', 'VALLE_DEL_CAUCA'),
+    (4.718, -76.238): ('EL_CAIRO', 'VALLE_DEL_CAUCA'),
+    (4.008, -76.971): ('BUENAVENTURA', 'VALLE_DEL_CAUCA'),
+    (3.56, -76.973): ('DAGUA', 'VALLE_DEL_CAUCA')
 }
 
 for coords, location in coordinates_mapping.items():
@@ -278,6 +290,31 @@ for coords, location in coordinates_mapping.items():
     municipio, departamento = location
     df2.loc[(df2['LATITUD'] == lat) & (df2['LONGITUD'] == lon), 'MUNICIPIO'] = municipio
     df2.loc[(df2['LATITUD'] == lat) & (df2['LONGITUD'] == lon), 'DEPARTAMENTO'] = departamento
+
+# 22. Replicate 'OCEANO_PACIFICO' and 'MAR_CARIBE' from 'MUNICIPIO' to 'DEPARTAMENTO'
+df2.loc[df2['MUNICIPIO'] == 'OCEANO_PACIFICO', 'DEPARTAMENTO'] = 'OCEANO_PACIFICO'
+df2.loc[df2['MUNICIPIO'] == 'MAR_CARIBE', 'DEPARTAMENTO'] = 'MAR_CARIBE'
+
+# 23. List of MUNICIPIO values to be removed
+municipios_to_remove = [
+    'NORTE_COLOMBIA',
+    'NEAR_NORTH_COAST_OF_COLOMBIA',
+    'CERCA_DE_LA_COSTA_DE_COLOMBIA',
+    'CERCA_DE_LA_COSTA_OESTE_DE_COLOMBIA',
+    'NORTHERN_COLOMBIA',
+    'VOLCAN_CHILES',
+    'VOLCAN_CERRO_NEGRO'
+]
+
+# Remove rows where MUNICIPIO is in the list
+df2 = df2[~df2['MUNICIPIO'].isin(municipios_to_remove)]
+
+# 24. Assign 'NARINO' to 'DEPARTAMENTO' for the specified 'MUNICIPIO' values
+df2.loc[df2['MUNICIPIO'] == 'VOLCAN_GALERAS', 'DEPARTAMENTO'] = 'NARINO'
+df2.loc[df2['MUNICIPIO'] == 'VOLCAN_AZUFRAL', 'DEPARTAMENTO'] = 'NARINO'
+df2.loc[df2['MUNICIPIO'] == 'VOLCAN_NEVADO_DEL_RUIZ', 'DEPARTAMENTO'] = 'CALDAS'
+df2.loc[df2['MUNICIPIO'] == 'VOLCAN_NEVADO_DEL_HUILA', 'DEPARTAMENTO'] = 'TOLIMA'
+
 
 
 
