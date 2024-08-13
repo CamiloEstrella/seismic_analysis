@@ -1,1 +1,0 @@
-Sismos hasta 31 de julio de 2024
