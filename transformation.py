@@ -343,16 +343,17 @@ df2 = df2.drop(columns=columns_to_remove)
 # ---------------------------------------------------------------------------------------
 ## 2. Create final dataframe (earthquakes)
 
-# Define the desired order of columns
-columns_order = ['FECHA', 'HORA_UTC', 'LATITUD', 'LONGITUD', 'DEPARTAMENTO', 'MUNICIPIO',
-                 'MAGNITUD', 'TIPO MAGNITUD', 'PROFUNDIDAD', 'FASES', 'RMS', 'GAP']
+# Rename 'MAGNITUDE' to 'MAGNITUD' in df1 to match df2
+df1 = df1.rename(columns={"MAGNITUDE": "MAGNITUD"})
 
-# Reorder the columns in df1 and df2
-df1 = df1[columns_order]
-df2 = df2[columns_order]
 
 # Combine df1 and df2
 earthquakes = pd.concat([df1, df2], ignore_index=True)
 
+# Define the desired order of columns
+columns_order = ['FECHA', 'HORA_UTC', 'LATITUD', 'LONGITUD', 'DEPARTAMENTO', 'MUNICIPIO',
+                 'MAGNITUD', 'TIPO MAGNITUD', 'PROFUNDIDAD', 'FASES', 'RMS', 'GAP']
+earthquakes = earthquakes[columns_order]
+
 # Save df to a CSV file
-earthquakes.to_csv('earthquakes.csv', index=False)
+# earthquakes.to_csv('earthquakes.csv', index=False)
