@@ -63,14 +63,19 @@ df2 = df2.drop(columns=['FECHA - HORA UTC'])
 df1 = df1.rename(columns={
     'LATITUD (grados)': 'LATITUD',
     'LONGITUD (grados)': 'LONGITUD',
-    'PROFUNDIDAD (Km)': 'PROFUNDIDAD'
+    'PROFUNDIDAD (Km)': 'PROFUNDIDAD',
+    '# FASES': 'FASES',
+    'RMS (Seg)': 'RMS',
+    'GAP (grados)': 'GAP'
 })
 
 # Rename columns in df2
 df2 = df2.rename(columns={
     'LATITUD (°)': 'LATITUD',
     'LONGITUD (°)': 'LONGITUD',
-    'PROF. (Km)': 'PROFUNDIDAD'
+    'PROF. (Km)': 'PROFUNDIDAD',
+    'RMS (Seg)': 'RMS',
+    'GAP (°)': 'GAP'
 })
 
 # Create a new 'MAGNITUDE' column using the provided rules
@@ -315,10 +320,39 @@ df2.loc[df2['MUNICIPIO'] == 'VOLCAN_AZUFRAL', 'DEPARTAMENTO'] = 'NARINO'
 df2.loc[df2['MUNICIPIO'] == 'VOLCAN_NEVADO_DEL_RUIZ', 'DEPARTAMENTO'] = 'CALDAS'
 df2.loc[df2['MUNICIPIO'] == 'VOLCAN_NEVADO_DEL_HUILA', 'DEPARTAMENTO'] = 'TOLIMA'
 
+# 25. Drop the 'PAIS' column from df2
+df2 = df2.drop(columns=['PAIS'])
 
+## 'DEPARTAMENTO' and 'MUNICIPIO' variables in df1
+# 1. Replace 'MANAURE_BALCON_DEL_CESAR' with 'MANAURE'
+df1['MUNICIPIO'] = df1['MUNICIPIO'].str.replace('MANAURE_BALCON_DEL_CESAR', 'MANAURE', regex=False)
 
+# 2. Replace 'BOGOTA.Distrito_Capital' with 'BOGOTA'
+df1['MUNICIPIO'] = df1['MUNICIPIO'].str.replace('BOGOTA.Distrito_Capital', 'BOGOTA', regex=False)
+
+# --- #
+# Columns to be removed
+columns_to_remove = ['ERROR LATITUD (Km)', 'ERROR LONGITUD (Km)', 'ERROR PROFUNDIDAD (Km)', 'ESTADO']
+
+# Remove columns from df1
+df1 = df1.drop(columns=columns_to_remove)
+
+# Remove columns from df2
+df2 = df2.drop(columns=columns_to_remove)
+
+# ---------------------------------------------------------------------------------------
+## 2. Create final dataframe (earthquakes)
+
+# Define the desired order of columns
+columns_order = ['FECHA', 'HORA_UTC', 'LATITUD', 'LONGITUD', 'DEPARTAMENTO', 'MUNICIPIO',
+                 'MAGNITUD', 'TIPO MAGNITUD', 'PROFUNDIDAD', 'FASES', 'RMS', 'GAP']
+
+# Reorder the columns in df1 and df2
+df1 = df1[columns_order]
+df2 = df2[columns_order]
+
+# Combine df1 and df2
+earthquakes = pd.concat([df1, df2], ignore_index=True)
 
 # Save df to a CSV file
-df1.to_csv('df1_modified.csv', index=False)
-df2.to_csv('df2_modified.csv', index=False)
-
+earthquakes.to_csv('earthquakes.csv', index=False)
